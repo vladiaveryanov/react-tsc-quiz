@@ -37,6 +37,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-router-dom": "^5.1.2",
     "@types/underscore": "^1.9.3"
   }
 }

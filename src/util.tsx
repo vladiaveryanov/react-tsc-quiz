@@ -11,9 +11,14 @@ export function shuffle(a) {
   return a;
 }
 
+const questions: any = {};
+
 export function getTurnData(
-  authors: interfaces.Authors[]
+  authors: interfaces.Authors[],
+  page: number
 ): interfaces.BooksAndAuthor {
+  // TODO Implement check
+
   let allBooks: string[] = [];
   authors.forEach(author => {
     for (const n of author.books) {
@@ -25,8 +30,10 @@ export function getTurnData(
   const num: number = Math.floor(Math.random() * 4);
   const answer: string = fourRandomBooks[num];
 
-  return {
+  questions[page] = {
     books: fourRandomBooks,
     author: authors.find(author => author.books.some(title => title === answer))
   };
+
+  return questions[page];
 }

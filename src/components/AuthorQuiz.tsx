@@ -1,86 +1,92 @@
-import React, { Component, useState } from 'react';
+import React, { useState, useContext } from 'react';
 import * as interfaces from '../interfaces/interfaces';
 import * as util from '../util';
 import authors from '../data/authorData';
 
 import {
   Card,
-  CardActionArea,
   CardMedia,
   CardContent,
   Typography,
   CardActions,
-  Button
+  Button,
+  FormControlLabel,
+  FormLabel,
+  RadioGroup,
+  FormControl,
+  Radio
 } from '@material-ui/core';
+import { useParams } from 'react-router-dom';
 
-export interface Authors {
-  name: string;
-  imageUrl: string;
-  books: string[];
-}
+export default function AuthorQuiz() {
+  const { page } = useParams();
+  const [{ turnData: { author, books } }, setState] = useState({
+    turnData: {
+      ...util.getTurnData(authors, parseInt(page))
+    }
+  });
 
-export interface Props {
-  author?: Authors;
-  books?: string[];
-}
+  // const [selectedAnswer, setSelectedAnswer] = useState({
+  //   selectedAnswer: ''
+  // });
 
-export interface State {
-  author?: Authors;
-  books?: string[];
-}
+  const dispatch = useContext(interfaces.AppDispatch);
 
-export default class AuthorQuiz extends Component<Props, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      author: util.getTurnData(authors).author,
-      books: util.getTurnData(authors).books
-    };
+  function handleAnswer() {
+
   }
-  // authorAndBooks = util.getTurnData(authors);
-  // componentWillMount() {
-  //   this.setState(this.authorAndBooks);
-  // }
-  render() {
-    console.log(this.state);
-    return (
-      <Card>
-        <CardActionArea>
-          <CardMedia
-            className='somename'
-            src={this.state.author.imageUrl}
-            style={{ height: '100%', width: '100%' }}
-            title='Lorem ipsum'
-          />
-          <CardContent>
-            <Typography gutterBottom variant='h5' component='h2'>
-              Author: {this.state.author.name}
-            </Typography>
-          </CardContent>
-        </CardActionArea>
-        <CardActions>
-          <Button size='small' color='primary'>
-            {this.state.books[0]}
+
+  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setSelectedAnswer({selectedAnswer: (event.target as HTMLInputElement).value});
+  // };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const clickedAnswer = (event.target as HTMLInputElement).value;
+
+    const answer = author.books.indexOf(clickedAnswer) > -1 ? interfaces.answerCorrect() : interfaces.answerWrong(clickedAnswer, author.books);  
+    dispatch(answer);
+  };
+
+  console.log(author);
+  return (
+    <Card>
+      <CardMedia
+        className='somename'
+        image={author.imageUrl}
+        style={{ width: 200, height: 200 }}
+        title='Lorem ipsum'
+      />
+      <CardContent>
+        <Typography gutterBottom variant='h5' component='h2'>
+          Author: {author.name}
+        </Typography>
+      </CardContent>
+      <CardActions>
+
+        <FormControl component="fieldset">
+          <RadioGroup aria-label="author" name="customized-radios">
+            {books.map(function (name, index) {
+              return <FormControlLabel
+                value={name}
+                key={index}
+                control={<Radio />}
+                label={name}
+                onChange={
+                  handleChange
+                }
+              />
+            })}
+          </RadioGroup>
+        </FormControl>
+      </CardActions>
+      <CardActions>
+        <Button variant="contained" size='medium' color='secondary' onClick={handleAnswer}>
+          Previous
           </Button>
-          <Button size='small' color='primary'>
-            {this.state.books[1]}
+        <Button variant="contained" size='medium' color='secondary' onClick={handleAnswer}>
+          Next
           </Button>
-          <Button size='small' color='primary'>
-            {this.state.books[2]}
-          </Button>
-          <Button size='small' color='primary'>
-            {this.state.books[3]}
-          </Button>
-        </CardActions>
-        <CardActions>
-          <Button size='medium' color='secondary'>
-            Previous
-          </Button>
-          <Button size='medium' color='secondary'>
-            Next
-          </Button>
-        </CardActions>
-      </Card>
-    );
-  }
+      </CardActions>
+    </Card>
+  );
 }
