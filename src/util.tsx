@@ -1,7 +1,7 @@
 import * as interfaces from './interfaces/interfaces';
 
 export function shuffle(a) {
-  var j, x, i;
+  let j, x, i;
   for (i = a.length - 1; i > 0; i--) {
     j = Math.floor(Math.random() * (i + 1));
     x = a[i];
@@ -17,7 +17,6 @@ export function getTurnData(
   authors: interfaces.Authors[],
   page: number
 ): interfaces.BooksAndAuthor {
-  // TODO Implement check
 
   let allBooks: string[] = [];
   authors.forEach(author => {
@@ -32,8 +31,9 @@ export function getTurnData(
 
   questions[page] = {
     books: fourRandomBooks,
-    author: authors.find(author => author.books.some(title => title === answer))
+    author: authors.find(author => author.books.some(title => title === answer)),
+    answer: answer
   };
-
+  console.log(questions[page]);
   return questions[page];
 }

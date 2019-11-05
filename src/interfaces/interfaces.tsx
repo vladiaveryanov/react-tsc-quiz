@@ -1,7 +1,7 @@
 import React from "react";
 
 export interface QuizState {
-  turnData?: BooksAndAuthor;
+  turnData: BooksAndAuthor;
   selectedAnswer?: string;
 }
 
@@ -14,6 +14,7 @@ export interface Authors {
 export interface BooksAndAuthor {
   author?: Authors;
   books?: string[];
+  answer: string;
 }
 
 export interface AppState {

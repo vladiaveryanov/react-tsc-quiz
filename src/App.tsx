@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import './App.css';
 
 import Header from './components/Header';
@@ -11,7 +11,7 @@ import { AppState, answerCorrect, answerWrong, AppDispatch } from './interfaces/
 type AppAction = ReturnType<typeof answerCorrect | typeof answerWrong>;
 
 function AppReducer(prevState: AppState, action: AppAction): AppState {
-  console.log('inside reducer',action);
+  // console.log('inside reducer', action);
   switch (action.type) {
     case 'ANSWER_CORRECT':
       return {
@@ -21,7 +21,9 @@ function AppReducer(prevState: AppState, action: AppAction): AppState {
     case 'ANSWER_WRONG':
       return {
         ...prevState,
-        mistakes: [...prevState.mistakes, { question: action.question, correctAnswer: action.correctAnswer }]
+        mistakes: [...prevState.mistakes,
+        { question: action.question, correctAnswer: action.correctAnswer }
+        ]
       };
     default:
       return prevState;
@@ -38,13 +40,18 @@ function App() {
     <AppDispatch.Provider value={dispatch}>
       <Router>
         <Header />
-        <Route path='/:page'>
-          <AuthorQuiz />
-        </Route>
-        <Route path='/results'>
-          { /* TODO implementation */ }
-          <Result />
-        </Route>
+        <Switch>
+          <Redirect exact from='/' to='/1'/>
+          <Route path='/:page' >
+            <AuthorQuiz />
+          </Route>
+          <Route path='/results'>
+            <Result />
+          </Route>
+          <Route path="*">
+            Default
+          </Route>
+        </Switch>
         <Footer />
       </Router>
     </AppDispatch.Provider>

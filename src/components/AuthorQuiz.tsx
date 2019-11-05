@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import * as interfaces from '../interfaces/interfaces';
 import * as util from '../util';
 import authors from '../data/authorData';
+import { useParams, Link } from 'react-router-dom';
 
 import {
   Card,
@@ -11,82 +12,80 @@ import {
   CardActions,
   Button,
   FormControlLabel,
-  FormLabel,
   RadioGroup,
   FormControl,
   Radio
 } from '@material-ui/core';
-import { useParams } from 'react-router-dom';
+import { AppDispatch } from '../interfaces/interfaces';
+
 
 export default function AuthorQuiz() {
   const { page } = useParams();
-  const [{ turnData: { author, books } }, setState] = useState({
+  const [{ turnData: { author, books, answer }, selectedAnswer }, setState] = useState({
     turnData: {
       ...util.getTurnData(authors, parseInt(page))
-    }
+    },
+    selectedAnswer: ''
   });
-
-  // const [selectedAnswer, setSelectedAnswer] = useState({
-  //   selectedAnswer: ''
-  // });
 
   const dispatch = useContext(interfaces.AppDispatch);
 
-  function handleAnswer() {
-
+  function handleChange(event) {
+    setState({
+      turnData: {
+        author: author,
+        books: books,
+        answer: answer
+      },
+      selectedAnswer: event.target.value
+    })
   }
 
-  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setSelectedAnswer({selectedAnswer: (event.target as HTMLInputElement).value});
-  // };
+  function handleAnswer() {
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const clickedAnswer = (event.target as HTMLInputElement).value;
-
-    const answer = author.books.indexOf(clickedAnswer) > -1 ? interfaces.answerCorrect() : interfaces.answerWrong(clickedAnswer, author.books);  
-    dispatch(answer);
+    const isAnswerCorrect = (answer === selectedAnswer) ? interfaces.answerCorrect() : interfaces.answerWrong(selectedAnswer, author.books);
+    dispatch(isAnswerCorrect);
   };
-
-  console.log(author);
+  let prevPage = `/${parseInt(page) - 1}`;
+  let nextPage =`/${parseInt(page) + 1}`;
   return (
     <Card>
       <CardMedia
-        className='somename'
         image={author.imageUrl}
         style={{ width: 200, height: 200 }}
         title='Lorem ipsum'
       />
       <CardContent>
         <Typography gutterBottom variant='h5' component='h2'>
-          Author: {author.name}
+          Author: {author.name} {page.match}
         </Typography>
       </CardContent>
       <CardActions>
-
         <FormControl component="fieldset">
-          <RadioGroup aria-label="author" name="customized-radios">
+          <RadioGroup aria-label="author" name="customized-radios" onChange={handleChange}>
             {books.map(function (name, index) {
               return <FormControlLabel
                 value={name}
                 key={index}
                 control={<Radio />}
                 label={name}
-                onChange={
-                  handleChange
-                }
               />
             })}
           </RadioGroup>
         </FormControl>
       </CardActions>
-      <CardActions>
+      {/* <AppDispatch.Consumer> */}
         <Button variant="contained" size='medium' color='secondary' onClick={handleAnswer}>
-          Previous
-          </Button>
-        <Button variant="contained" size='medium' color='secondary' onClick={handleAnswer}>
+          <Link to={prevPage}>
+            Previous
+          </Link>
+        </Button>
+      {/* </AppDispatch.Consumer> */}
+      <Button variant="contained" size='medium' color='secondary' onClick={handleAnswer}>
+        <Link to={nextPage} >
           Next
-          </Button>
-      </CardActions>
+        </Link>
+      </Button>
     </Card>
   );
 }
