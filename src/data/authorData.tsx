@@ -23,19 +23,19 @@ const authors: interfaces.Authors[] = [
     name: 'Stephen King',
     imageUrl:
       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Stephen_King%2C_Comicon.jpg/200px-Stephen_King%2C_Comicon.jpg',
-    books: ['The Shining', 'IT']
+    books: ['IT']
   },
   {
     name: 'Charles Dickens',
     imageUrl:
       'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Portrait_of_Charles_Dickens_%284671094%29.jpg/200px-Portrait_of_Charles_Dickens_%284671094%29.jpg',
-    books: ['David Copperfield', 'A Tale of Two Cities']
+    books: ['David Copperfield']
   },
   {
     name: 'William Shakespeare',
     imageUrl:
       'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Shakespeare.jpg/200px-Shakespeare.jpg',
-    books: ['Hamlet', 'Macbeth', 'Romeo and Juliet']
+    books: ['Hamlet']
   }
 ];
 

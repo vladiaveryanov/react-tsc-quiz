@@ -11,19 +11,20 @@ import { AppState, answerCorrect, answerWrong, AppDispatch } from './interfaces/
 type AppAction = ReturnType<typeof answerCorrect | typeof answerWrong>;
 
 function AppReducer(prevState: AppState, action: AppAction): AppState {
-  console.log('AppReducer - inside func')
   switch (action.type) {
     case 'ANSWER_CORRECT':
       return {
         ...prevState,
-        correctAnswersCount: prevState.correctAnswersCount + 1
+        correctAnswersCount: prevState.correctAnswersCount + 1,
+        valuesSelectedOnPages: [...prevState.valuesSelectedOnPages, { page: action.page, selectedValue: action.selectedValue }]
       }
     case 'ANSWER_WRONG':
       return {
         ...prevState,
         mistakes: [...prevState.mistakes,
         { question: action.question, correctAnswer: action.correctAnswer }
-        ]
+        ],
+        valuesSelectedOnPages: [...prevState.valuesSelectedOnPages, { page: action.page, selectedValue: action.selectedValue }]
       };
     default:
       return prevState;
@@ -31,33 +32,33 @@ function AppReducer(prevState: AppState, action: AppAction): AppState {
 }
 
 function App() {
-  console.log('App - inside main func')
-  const [reducer, dispatch] = useReducer(AppReducer, {
+  const [data, dispatch] = useReducer(AppReducer, {
     mistakes: [],
-    correctAnswersCount: 0
+    correctAnswersCount: 0,
+    valuesSelectedOnPages: []
   });
-  console.log(reducer);
+  console.log(data);
   return (
-    <AppDispatch.Provider value={{ dispatch, data: reducer }}>
+    <AppDispatch.Provider value={{ dispatch, data }}>
       <Router>
-        <Header />
         <Switch>
           <Redirect exact from='/' to='/1' />
           <Route exact path='/results'>
             <Result />
           </Route>
           <Route path='/:page'>
+            <Header />
             <AuthorQuiz numberOfQuestions={5} />
+            <Footer />
           </Route>
           <Route path="*">
-              Default
+            Default
           </Route>
         </Switch>
-          <Footer />
       </Router>
     </AppDispatch.Provider>
-      );
-    
-    }
-    
-    export default App;
+  );
+
+}
+
+export default App;

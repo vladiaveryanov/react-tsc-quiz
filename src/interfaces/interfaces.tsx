@@ -20,6 +20,7 @@ export interface BooksAndAuthor {
 export interface AppState {
   mistakes: Mistake[],
   correctAnswersCount: number,
+  valuesSelectedOnPages: ValuesSelectedOnPages[],
 }
 
 export interface Mistake {
@@ -27,18 +28,27 @@ export interface Mistake {
   correctAnswer: string
 }
 
+export interface ValuesSelectedOnPages {
+  page: number,
+  selectedValue: string
+}
+
 export const AppDispatch = React.createContext(null);
 
-export function answerCorrect() {
+export function answerCorrect( page: number, selectedValue: string) {
   return {
-    type: 'ANSWER_CORRECT'
+    type: 'ANSWER_CORRECT',
+    page,
+    selectedValue
   } as const;
 }
 
-export function answerWrong(question: string, correctAnswer: string) {
+export function answerWrong(question: string, correctAnswer: string, page: number, selectedValue: string) {
   return {
     type: 'ANSWER_WRONG',
     question,
-    correctAnswer
+    correctAnswer,
+    page,
+    selectedValue
   } as const;
 }

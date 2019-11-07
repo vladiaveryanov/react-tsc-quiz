@@ -3,7 +3,6 @@ import * as interfaces from '../interfaces/interfaces';
 import * as util from '../util';
 import authors from '../data/authorData';
 import { useParams, useHistory } from 'react-router-dom';
-import Result from './Result';
 import {
   Card,
   CardMedia,
@@ -14,7 +13,8 @@ import {
   FormControlLabel,
   RadioGroup,
   FormControl,
-  Radio
+  Radio,
+  Grid
 } from '@material-ui/core';
 
 
@@ -28,7 +28,7 @@ export default function AuthorQuiz(
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [currentPage, setCurrentPage] = useState(page);
   const { author, books, answer } = turnData;
-  const { dispatch } = useContext(interfaces.AppDispatch);
+  const { data, dispatch } = useContext(interfaces.AppDispatch);
 
   useEffect(() => {
     if (page !== currentPage) {
@@ -37,7 +37,16 @@ export default function AuthorQuiz(
       setTurnData(util.getTurnData(authors, page));
       setSelectedAnswer('');
     }
-  }, [page]);
+
+    if (data.valuesSelectedOnPages.length > 0) {
+      data.valuesSelectedOnPages.forEach(element => {
+        if (element.page === page) {
+          setSelectedAnswer(element.selectedValue);
+        }
+      });
+    }
+
+  }, [page, data, currentPage]);
 
   function handleChange(event) {
     setSelectedAnswer(event.target.value);
@@ -45,8 +54,8 @@ export default function AuthorQuiz(
 
   function handleAnswer(moveToNextPage: boolean) {
     let nextPage: number = 0;
-    const isAnswerCorrect = (answer === selectedAnswer) ? interfaces.answerCorrect() 
-      : interfaces.answerWrong(author.name, answer);
+    const isAnswerCorrect = (answer === selectedAnswer) ? interfaces.answerCorrect(page, selectedAnswer)
+      : interfaces.answerWrong(author.name, answer, page, selectedAnswer);
     dispatch(isAnswerCorrect);
 
     if (moveToNextPage) {
@@ -55,7 +64,7 @@ export default function AuthorQuiz(
       nextPage = page - 1;
     }
 
-    if (page >= numberOfQuestions) {
+    if (currentPage === numberOfQuestions && moveToNextPage) {
       history.push('/results');
     } else {
       history.push('/' + nextPage);
@@ -63,45 +72,48 @@ export default function AuthorQuiz(
   };
 
   return (
-    <Card>
-      <CardMedia
-        image={author.imageUrl}
-        style={{ width: 200, height: 200 }}
-        title='Lorem ipsum'
-      />
-      <CardContent>
-        <Typography gutterBottom variant='h5' component='h2'>
-          Author: {author.name}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <FormControl component="fieldset">
-          <RadioGroup aria-label="author" name="customized-radios" 
-            value={selectedAnswer} onChange={handleChange}>
-            {books.map(function (name, index) {
-              return <FormControlLabel
-                value={name}
-                key={index}
-                control={<Radio />}
-                label={name}
-              />
-            })}
-          </RadioGroup>
-        </FormControl>
-      </CardActions>
-      <Button variant="contained"
-        size='medium'
-        color='secondary'
-        onClick={() => handleAnswer(false)}>
-        Previous
-      </Button>
-      <Button variant="contained"
-        size='medium'
-        color='secondary'
-        disabled={!selectedAnswer}
-        onClick={() => handleAnswer(true)}>
-        Next
-      </Button>
-    </Card>
+    <Grid container justify="center" alignItems="center" >
+      <Card>
+        <CardMedia
+          image={author.imageUrl}
+          style={{ width: 340, height: 300 }}
+          title='Lorem ipsum'
+        />
+        <CardContent>
+          <Typography gutterBottom variant='h5' component='h2'>
+            Author: {author.name}
+          </Typography>
+        </CardContent>
+        <CardActions>
+          <FormControl component="fieldset">
+            <RadioGroup aria-label="author" name="customized-radios"
+              value={selectedAnswer} onChange={handleChange}>
+              {books.map(function (name, index) {
+                return <FormControlLabel
+                  value={name}
+                  key={index}
+                  control={<Radio />}
+                  label={name}
+                />
+              })}
+            </RadioGroup>
+          </FormControl>
+        </CardActions>
+        <Button variant="contained"
+          size='medium'
+          color='secondary'
+          disabled={currentPage === 1}
+          onClick={() => handleAnswer(false)}>
+          Previous
+            </Button>
+        <Button variant="contained"
+          size='medium'
+          color='secondary'
+          disabled={!selectedAnswer}
+          onClick={() => handleAnswer(true)}>
+          Next
+            </Button>
+      </Card>
+    </Grid>
   );
 }

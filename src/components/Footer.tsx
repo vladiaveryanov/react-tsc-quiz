@@ -1,18 +1,23 @@
 import React, { Component } from 'react';
+import {
+  Typography, Box, Grid, Link
+} from '@material-ui/core';
+
 export default class Footer extends Component {
   render() {
     return (
-      <div id='footer' className='row'>
-        <div className='col-12'>
-          <p className='text-muted credit'>
-            All images are from{' '}
-            <a href='http://commons.wikimedia.org/wiki/Main_Page'>
-              Wikemedia Commons
-            </a>{' '}
-            and are in the public domain
-          </p>
-        </div>
-      </div>
+
+      <Grid container justify="center" alignItems="center" >
+            <Box p={2}>
+              <Typography>
+                All images are from&nbsp;
+            <Link href="http://commons.wikimedia.org/wiki/Main_Page" variant="body2" >
+                  Wikemedia Commons
+            </Link>
+                &nbsp;and are in the public domain
+          </Typography>
+            </Box>
+        </Grid>
     );
   }
 }
