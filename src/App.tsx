@@ -24,12 +24,12 @@ function AppReducer(prevState: AppState, action: AppAction): AppState {
 }
 
 function App() {
-  const [data, dispatch] = useReducer(AppReducer, {
+  const [contextData, dispatch] = useReducer(AppReducer, {
     appData: {}
   });
-  console.log(data);
+  console.log(contextData);
   return (
-    <AppDispatch.Provider value={{ dispatch, data }}>
+    <AppDispatch.Provider value={{ dispatch, contextData }}>
       <Router>
         <Switch>
           <Redirect exact from='/' to='/1' />

@@ -28,7 +28,7 @@ export default function AuthorQuiz(
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [currentPage, setCurrentPage] = useState(page);
   const { author, books, answer } = turnData;
-  const { data, dispatch } = useContext(interfaces.AppDispatch);
+  const { contextData, dispatch } = useContext(interfaces.AppDispatch);
 
   useEffect(() => {
     if (page !== currentPage) {
@@ -38,9 +38,9 @@ export default function AuthorQuiz(
       setSelectedAnswer('');
     }
 
-    if (Object.keys(data.appData).length > 0) {
-      for (let key in data.appData) {
-        let value = data.appData[key];
+    if (Object.keys(contextData.appData).length > 0) {
+      for (let key in contextData.appData) {
+        let value = contextData.appData[key];
         if (value.page === page) {
           setSelectedAnswer(value.selectedValue);
         }
@@ -49,27 +49,19 @@ export default function AuthorQuiz(
 
   }, [page]);
 
-  function handleChange(event) {
+  function handleChange(event: { target: { value: React.SetStateAction<string>; }; }) {
     setSelectedAnswer(event.target.value);
   }
 
   function handleAnswer(moveToNextPage: boolean) {
     let nextPage: number = 0;
     const isAnswerCorrect = interfaces.answer(page, author.name, answer, selectedAnswer);
-    console.log('tuk', isAnswerCorrect);
+
     dispatch(isAnswerCorrect);
 
-    if (moveToNextPage) {
-      nextPage = page + 1;
-    } else {
-      nextPage = page - 1;
-    }
+    moveToNextPage ? nextPage = page + 1 : nextPage = page - 1;
 
-    if (currentPage === numberOfQuestions && moveToNextPage) {
-      history.push('/results');
-    } else {
-      history.push('/' + nextPage);
-    }
+    currentPage === numberOfQuestions && moveToNextPage ? history.push('/results') : history.push('/' + nextPage);
   };
 
   return (
@@ -84,8 +76,6 @@ export default function AuthorQuiz(
           <Typography gutterBottom variant='h5' component='h2'>
             Author: {author.name}
           </Typography>
-        </CardContent>
-        <CardActions>
           <FormControl component="fieldset">
             <RadioGroup aria-label="author" name="customized-radios"
               value={selectedAnswer} onChange={handleChange}>
@@ -99,21 +89,23 @@ export default function AuthorQuiz(
               })}
             </RadioGroup>
           </FormControl>
+        </CardContent>
+        <CardActions>
+          <Button variant="contained"
+            size='medium'
+            color='secondary'
+            disabled={currentPage === 1}
+            onClick={() => handleAnswer(false)}>
+            Previous
+            </Button>
+          <Button variant="contained"
+            size='medium'
+            color='secondary'
+            disabled={!selectedAnswer}
+            onClick={() => handleAnswer(true)}>
+            Next
+            </Button>
         </CardActions>
-        <Button variant="contained"
-          size='medium'
-          color='secondary'
-          disabled={currentPage === 1}
-          onClick={() => handleAnswer(false)}>
-          Previous
-            </Button>
-        <Button variant="contained"
-          size='medium'
-          color='secondary'
-          disabled={!selectedAnswer}
-          onClick={() => handleAnswer(true)}>
-          Next
-            </Button>
       </Card>
     </Grid>
   );

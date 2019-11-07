@@ -6,23 +6,28 @@ import {
 import { AppDispatch } from '../interfaces/interfaces';
 
 export default function Result() {
-  const { data } = useContext(AppDispatch);
+
+  const { contextData } = useContext(AppDispatch);
   let correctAnswersCount = 0;
-  function generateResults(completedData: {}): string[] {
+
+  function generateResults(completedData: { [key: string]: any; }): string[] {
     let arr: string[] = [];
+
     for (let key in completedData) {
       let value = completedData[key];
+      
       if (value.selectedValue !== value.correctAnswer) {
         arr.push(`${value.question} wrote "${value.correctAnswer}" not "${value.selectedValue}"`)
       } else {
         correctAnswersCount++;
       }
     }
+
     return arr;
   }
 
-  let conclusion: string[] = generateResults(data.appData);
-  console.log(conclusion);
+  let conclusion: string[] = generateResults(contextData.appData);
+  
   return (
     <Grid container justify="center" alignItems="center" >
       <Grid item>
@@ -44,7 +49,7 @@ export default function Result() {
                 return <Box bgcolor="secondary.main" color="secondary.contrastText" key={index} p={2} m={1}>
                   <Typography variant="body1">
                     {mistake}
-            </Typography>
+                  </Typography>
                 </Box>
               })
             }

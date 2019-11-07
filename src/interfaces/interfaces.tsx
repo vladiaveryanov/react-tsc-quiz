@@ -8,7 +8,7 @@ export interface QuizState {
 export interface Authors {
   name: string;
   imageUrl: string;
-  books: string[];
+  books: string;
 }
 
 export interface BooksAndAuthor {

@@ -1,14 +1,18 @@
 import * as interfaces from './interfaces/interfaces';
 
-export function shuffle(a) {
-  let j, x, i;
-  for (i = a.length - 1; i > 0; i--) {
-    j = Math.floor(Math.random() * (i + 1));
-    x = a[i];
-    a[i] = a[j];
-    a[j] = x;
+export function shuffle(books: string[]) {
+  let randomIndex: number;
+  let book: string;
+  let index: number;
+
+  for (index = books.length - 1; index > 0; index--) {
+    randomIndex = Math.floor(Math.random() * (index + 1));
+    book = books[index];
+    books[index] = books[randomIndex];
+    books[randomIndex] = book;
   }
-  return a;
+
+  return books;
 }
 
 let questions: any = {};
@@ -17,24 +21,25 @@ export function getTurnData(
   authors: interfaces.Authors[],
   page: number
 ): interfaces.BooksAndAuthor {
+
   if (questions[page]) {
     return questions[page];
   }
   
   let allBooks: string[] = [];
+  
   authors.forEach(author => {
-    for (const n of author.books) {
-      allBooks.push(n);
-    }
+    allBooks.push(author.books);
   });
   
   const fourRandomBooks: string[] = shuffle(allBooks).slice(0, 4);
   const num: number = Math.floor(Math.random() * 4);
   const answer: string = fourRandomBooks[num];
   
+  //rename keys
   questions[page] = {
     books: fourRandomBooks,
-    author: authors.find(author => author.books.some(title => title === answer)),
+    author: authors.find(author => author.books === answer),
     answer: answer
   };
 
