@@ -38,15 +38,16 @@ export default function AuthorQuiz(
       setSelectedAnswer('');
     }
 
-    if (data.valuesSelectedOnPages.length > 0) {
-      data.valuesSelectedOnPages.forEach(element => {
-        if (element.page === page) {
-          setSelectedAnswer(element.selectedValue);
+    if (Object.keys(data.appData).length > 0) {
+      for (let key in data.appData) {
+        let value = data.appData[key];
+        if (value.page === page) {
+          setSelectedAnswer(value.selectedValue);
         }
-      });
+      }
     }
 
-  }, [page, data, currentPage]);
+  }, [page]);
 
   function handleChange(event) {
     setSelectedAnswer(event.target.value);
@@ -54,8 +55,8 @@ export default function AuthorQuiz(
 
   function handleAnswer(moveToNextPage: boolean) {
     let nextPage: number = 0;
-    const isAnswerCorrect = (answer === selectedAnswer) ? interfaces.answerCorrect(page, selectedAnswer)
-      : interfaces.answerWrong(author.name, answer, page, selectedAnswer);
+    const isAnswerCorrect = interfaces.answer(page, author.name, answer, selectedAnswer);
+    console.log('tuk', isAnswerCorrect);
     dispatch(isAnswerCorrect);
 
     if (moveToNextPage) {

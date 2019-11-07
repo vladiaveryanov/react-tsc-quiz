@@ -7,6 +7,22 @@ import { AppDispatch } from '../interfaces/interfaces';
 
 export default function Result() {
   const { data } = useContext(AppDispatch);
+  let correctAnswersCount = 0;
+  function generateResults(completedData: {}): string[] {
+    let arr: string[] = [];
+    for (let key in completedData) {
+      let value = completedData[key];
+      if (value.selectedValue !== value.correctAnswer) {
+        arr.push(`${value.question} wrote "${value.correctAnswer}" not "${value.selectedValue}"`)
+      } else {
+        correctAnswersCount++;
+      }
+    }
+    return arr;
+  }
+
+  let conclusion: string[] = generateResults(data.appData);
+  console.log(conclusion);
   return (
     <Grid container justify="center" alignItems="center" >
       <Grid item>
@@ -17,17 +33,17 @@ export default function Result() {
         </Typography>
             <Box bgcolor="primary.main" color="primary.contrastText" p={2} m={1}>
               <Typography variant="h5" component="h2">
-                Correct answers: {data.correctAnswersCount}
+                Correct answers: {correctAnswersCount}
               </Typography>
             </Box>
             <Typography variant="h5" component="h2">
               Mistakes:
         </Typography>
             {
-              data.mistakes.map(function (book, index) {
+              conclusion.map(function (mistake, index) {
                 return <Box bgcolor="secondary.main" color="secondary.contrastText" key={index} p={2} m={1}>
                   <Typography variant="body1">
-                    {book.question} wrote "{book.correctAnswer}"
+                    {mistake}
             </Typography>
                 </Box>
               })

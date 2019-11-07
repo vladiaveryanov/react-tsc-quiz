@@ -6,25 +6,17 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import AuthorQuiz from './components/AuthorQuiz';
 import Result from './components/Result';
-import { AppState, answerCorrect, answerWrong, AppDispatch } from './interfaces/interfaces';
+import { AppState, answer, AppDispatch } from './interfaces/interfaces';
 
-type AppAction = ReturnType<typeof answerCorrect | typeof answerWrong>;
+type AppAction = ReturnType<typeof answer>;
 
 function AppReducer(prevState: AppState, action: AppAction): AppState {
+  let allData = prevState;
+  allData.appData[action.page] = action;
   switch (action.type) {
-    case 'ANSWER_CORRECT':
+    case 'ANSWER':
       return {
-        ...prevState,
-        correctAnswersCount: prevState.correctAnswersCount + 1,
-        valuesSelectedOnPages: [...prevState.valuesSelectedOnPages, { page: action.page, selectedValue: action.selectedValue }]
-      }
-    case 'ANSWER_WRONG':
-      return {
-        ...prevState,
-        mistakes: [...prevState.mistakes,
-        { question: action.question, correctAnswer: action.correctAnswer }
-        ],
-        valuesSelectedOnPages: [...prevState.valuesSelectedOnPages, { page: action.page, selectedValue: action.selectedValue }]
+        appData: allData.appData
       };
     default:
       return prevState;
@@ -33,9 +25,7 @@ function AppReducer(prevState: AppState, action: AppAction): AppState {
 
 function App() {
   const [data, dispatch] = useReducer(AppReducer, {
-    mistakes: [],
-    correctAnswersCount: 0,
-    valuesSelectedOnPages: []
+    appData: {}
   });
   console.log(data);
   return (
