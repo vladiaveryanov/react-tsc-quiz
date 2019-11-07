@@ -1,9 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import * as interfaces from '../interfaces/interfaces';
 import * as util from '../util';
 import authors from '../data/authorData';
-import { useParams, Link } from 'react-router-dom';
-
+import { useParams, useHistory } from 'react-router-dom';
+import Result from './Result';
 import {
   Card,
   CardMedia,
@@ -16,38 +16,52 @@ import {
   FormControl,
   Radio
 } from '@material-ui/core';
-import { AppDispatch } from '../interfaces/interfaces';
 
 
-export default function AuthorQuiz() {
-  const { page } = useParams();
-  const [{ turnData: { author, books, answer }, selectedAnswer }, setState] = useState({
-    turnData: {
-      ...util.getTurnData(authors, parseInt(page))
-    },
-    selectedAnswer: ''
-  });
+export default function AuthorQuiz(
+  { numberOfQuestions }: { numberOfQuestions: number }) {
+  const history = useHistory();
+  const { page: pageAsStr } = useParams();
+  const page = parseInt(pageAsStr);
 
-  const dispatch = useContext(interfaces.AppDispatch);
+  const [turnData, setTurnData] = useState(util.getTurnData(authors, page));
+  const [selectedAnswer, setSelectedAnswer] = useState('');
+  const [currentPage, setCurrentPage] = useState(page);
+  const { author, books, answer } = turnData;
+  const { dispatch } = useContext(interfaces.AppDispatch);
+
+  useEffect(() => {
+    if (page !== currentPage) {
+      setCurrentPage(page);
+      // Page changed, load new turn data, reset selected answer.
+      setTurnData(util.getTurnData(authors, page));
+      setSelectedAnswer('');
+    }
+  }, [page]);
 
   function handleChange(event) {
-    setState({
-      turnData: {
-        author: author,
-        books: books,
-        answer: answer
-      },
-      selectedAnswer: event.target.value
-    })
+    setSelectedAnswer(event.target.value);
   }
 
-  function handleAnswer() {
-
-    const isAnswerCorrect = (answer === selectedAnswer) ? interfaces.answerCorrect() : interfaces.answerWrong(selectedAnswer, author.books);
+  function handleAnswer(moveToNextPage: boolean) {
+    let nextPage: number = 0;
+    const isAnswerCorrect = (answer === selectedAnswer) ? interfaces.answerCorrect() 
+      : interfaces.answerWrong(author.name, answer);
     dispatch(isAnswerCorrect);
+
+    if (moveToNextPage) {
+      nextPage = page + 1;
+    } else {
+      nextPage = page - 1;
+    }
+
+    if (page >= numberOfQuestions) {
+      history.push('/results');
+    } else {
+      history.push('/' + nextPage);
+    }
   };
-  let prevPage = `/${parseInt(page) - 1}`;
-  let nextPage =`/${parseInt(page) + 1}`;
+
   return (
     <Card>
       <CardMedia
@@ -57,12 +71,13 @@ export default function AuthorQuiz() {
       />
       <CardContent>
         <Typography gutterBottom variant='h5' component='h2'>
-          Author: {author.name} {page.match}
+          Author: {author.name}
         </Typography>
       </CardContent>
       <CardActions>
         <FormControl component="fieldset">
-          <RadioGroup aria-label="author" name="customized-radios" onChange={handleChange}>
+          <RadioGroup aria-label="author" name="customized-radios" 
+            value={selectedAnswer} onChange={handleChange}>
             {books.map(function (name, index) {
               return <FormControlLabel
                 value={name}
@@ -74,17 +89,18 @@ export default function AuthorQuiz() {
           </RadioGroup>
         </FormControl>
       </CardActions>
-      {/* <AppDispatch.Consumer> */}
-        <Button variant="contained" size='medium' color='secondary' onClick={handleAnswer}>
-          <Link to={prevPage}>
-            Previous
-          </Link>
-        </Button>
-      {/* </AppDispatch.Consumer> */}
-      <Button variant="contained" size='medium' color='secondary' onClick={handleAnswer}>
-        <Link to={nextPage} >
-          Next
-        </Link>
+      <Button variant="contained"
+        size='medium'
+        color='secondary'
+        onClick={() => handleAnswer(false)}>
+        Previous
+      </Button>
+      <Button variant="contained"
+        size='medium'
+        color='secondary'
+        disabled={!selectedAnswer}
+        onClick={() => handleAnswer(true)}>
+        Next
       </Button>
     </Card>
   );

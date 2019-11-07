@@ -11,7 +11,7 @@ import { AppState, answerCorrect, answerWrong, AppDispatch } from './interfaces/
 type AppAction = ReturnType<typeof answerCorrect | typeof answerWrong>;
 
 function AppReducer(prevState: AppState, action: AppAction): AppState {
-  // console.log('inside reducer', action);
+  console.log('AppReducer - inside func')
   switch (action.type) {
     case 'ANSWER_CORRECT':
       return {
@@ -31,32 +31,33 @@ function AppReducer(prevState: AppState, action: AppAction): AppState {
 }
 
 function App() {
+  console.log('App - inside main func')
   const [reducer, dispatch] = useReducer(AppReducer, {
     mistakes: [],
     correctAnswersCount: 0
   });
-  console.log('state', reducer)
+  console.log(reducer);
   return (
-    <AppDispatch.Provider value={dispatch}>
+    <AppDispatch.Provider value={{ dispatch, data: reducer }}>
       <Router>
         <Header />
         <Switch>
-          <Redirect exact from='/' to='/1'/>
-          <Route path='/:page' >
-            <AuthorQuiz />
-          </Route>
-          <Route path='/results'>
+          <Redirect exact from='/' to='/1' />
+          <Route exact path='/results'>
             <Result />
           </Route>
+          <Route path='/:page'>
+            <AuthorQuiz numberOfQuestions={5} />
+          </Route>
           <Route path="*">
-            Default
+              Default
           </Route>
         </Switch>
-        <Footer />
+          <Footer />
       </Router>
     </AppDispatch.Provider>
-  );
-
-}
-
-export default App;
+      );
+    
+    }
+    
+    export default App;

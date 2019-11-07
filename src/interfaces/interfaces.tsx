@@ -24,7 +24,7 @@ export interface AppState {
 
 export interface Mistake {
   question: string,
-  correctAnswer: string[]
+  correctAnswer: string
 }
 
 export const AppDispatch = React.createContext(null);
@@ -35,7 +35,7 @@ export function answerCorrect() {
   } as const;
 }
 
-export function answerWrong(question: string, correctAnswer: string[]) {
+export function answerWrong(question: string, correctAnswer: string) {
   return {
     type: 'ANSWER_WRONG',
     question,

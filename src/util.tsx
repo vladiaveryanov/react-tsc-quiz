@@ -11,29 +11,32 @@ export function shuffle(a) {
   return a;
 }
 
-const questions: any = {};
+let questions: any = {};
 
 export function getTurnData(
   authors: interfaces.Authors[],
   page: number
 ): interfaces.BooksAndAuthor {
-
+  if (questions[page]) {
+    return questions[page];
+  }
+  
   let allBooks: string[] = [];
   authors.forEach(author => {
     for (const n of author.books) {
       allBooks.push(n);
     }
   });
-
+  
   const fourRandomBooks: string[] = shuffle(allBooks).slice(0, 4);
   const num: number = Math.floor(Math.random() * 4);
   const answer: string = fourRandomBooks[num];
-
+  
   questions[page] = {
     books: fourRandomBooks,
     author: authors.find(author => author.books.some(title => title === answer)),
     answer: answer
   };
-  console.log(questions[page]);
+
   return questions[page];
 }
