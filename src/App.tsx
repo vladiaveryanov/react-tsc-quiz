@@ -7,6 +7,23 @@ import Footer from './components/Footer';
 import AuthorQuiz from './components/AuthorQuiz';
 import Result from './components/Result';
 import { AppState, answer, AppDispatch } from './interfaces/interfaces';
+import NoMatch from './components/NoMatch';
+
+function correctUrl(url: string): boolean {
+  return correctUrls.indexOf(url) > -1 ? true : false;
+}
+const correctUrls = ["/1", "/2", "/3", "/4", "/5", "/results"];
+
+const routes = [
+  {
+    path: "/results",
+    component: Result
+  },
+  {
+    path: "/:page",
+    component: () => AuthorQuiz({ numberOfQuestions: 5 })
+  }
+];
 
 type AppAction = ReturnType<typeof answer>;
 
@@ -27,26 +44,35 @@ function App() {
   const [contextData, dispatch] = useReducer(AppReducer, {
     appData: {}
   });
-  console.log(contextData);
+
+  function RouteWithSubRoutes(route) {
+    if (correctUrl(route.location.pathname.toString())) {
+      return (
+        <Route path={route.path} render={props => (<route.component {...props} routes={route.routes} />)} />
+      );
+    } else {
+      return (
+        <NoMatch location={route.location.pathname} />
+      );
+    }
+
+  }
+
   return (
     <AppDispatch.Provider value={{ dispatch, contextData }}>
+      <Header />
       <Router>
         <Switch>
           <Redirect exact from='/' to='/1' />
-          <Route exact path='/results'>
-            <Result />
-          </Route>
-          <Route path='/:page'>
-            <Header />
-            <AuthorQuiz numberOfQuestions={5} />
-            <Footer />
-          </Route>
-          <Route path="*">
-            Default
-          </Route>
+          {routes.map((route, i) => (
+            <RouteWithSubRoutes key={i} {...route} />
+          ))}
+          <Route component={NoMatch} />
         </Switch>
       </Router>
+      <Footer />
     </AppDispatch.Provider>
+
   );
 
 }
